@@ -19,7 +19,9 @@ services.server.emitAction$("login",{username: "foo", password: "bar"})
 require("./components/player/player");
 require("./components/users/users");
 require("./components/chat/chat");
+require("./components/playlist/playlist");
 //-----------------------------------
 // Bootstrap
 
-services.socket.connect();
+services.socket.connect(); 
+
