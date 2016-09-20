@@ -4,18 +4,21 @@ import {Observable} from "rxjs";
 export class UsersStore {
     constructor(server) {
         this._server = server; 
-    // Users List
-    const defaultStore = {users: []};
-    const events$ =  Observable.merge(
-        this._server.on$("users:list").map(opList),
-        this._server.on$("users:added").map(opAdd));
-    this.state$ = events$
-        .scan(function(last,op) {
-            return op(last.state); 
-        }, {state: defaultStore})
-        .publishReplay(1);
+        // Users List
+        const defaultStore = {users: []};
+        const events$ =  Observable.merge(
+            this._server.on$("users:list").map(opList),
+            this._server.on$("users:added").map(opAdd)
+        ); 
+        this.state$ = events$
+            .scan(({state}/*ES6 pattern matching here*/,op)=>op(state), {state: defaultStore})
+            .publishReplay(1); // this observable's output stream is the lastest state.
     
-    this.state$.connect();
+        this.state$.connect(); //almost forget, this connect is to enable publish stream
+        //Bootstrap
+        this._server.on("connect",()=>{
+            this._server.emit("users:list");
+        });
     }
 }
 

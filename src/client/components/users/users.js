@@ -6,9 +6,10 @@ import "./users.scss";
 
 
 class UsersComponent extends ElementComponent {
-    constructor() {
+    constructor(usersStore) {
         super("ul");
         this.$element.addClass("users");
+        this._users = usersStore;
     }
     
     _onAttach(){
