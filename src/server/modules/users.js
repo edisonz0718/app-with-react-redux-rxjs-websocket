@@ -1,7 +1,7 @@
 import _ from "lodash";
 import {ModuleBase} from "../lib/module";
 
-
+const AuthContext = Symbol("AuthContext");
 export class UsersModule extends ModuleBase {
     constructor(io){
         super();
@@ -23,16 +23,13 @@ export class UsersModule extends ModuleBase {
             
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     }
+    getUserForClient(client){
+        const auth = client[AuthContext];
+        return auth ? auth: null;
+    }
     
     registerClient(client){
-        /*
-        let index = 0;
-        setInterval(()=>{
-            const username = `New user ${index++}`;
-            const user = {name : username, color: this.getColorForUsername(username)};
-            client.emit("users:added",user);
-        },2000);
-        */
+        
         client.onActions({
             "users:list": () =>{
                 return this._userList;

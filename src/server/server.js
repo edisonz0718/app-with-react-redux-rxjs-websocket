@@ -3,7 +3,7 @@ import express from "express";
 import http from "http";
 import socketIo from "socket.io";
 import chalk from "chalk";
-
+import "shared/operators";
 import {ObservableSocket} from "shared/observable-socket";
 
 import {UsersModule} from "./modules/users";
