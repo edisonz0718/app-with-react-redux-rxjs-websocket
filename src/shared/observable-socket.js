@@ -6,6 +6,16 @@ export function clientMessage(message){
     return error;
 }
 
+export function fail(message){
+    //clientMessage is a special name for throw I guess
+    return Observable.throw({clientMessage: message}); 
+}
+
+let successObservable = Observable.empty();
+export function success() {
+    return successObservable;
+}
+
 export class ObservableSocket {
     get isConnected() {return this._state.isConneted;}
     get isReconnecting() {return this._state.isReconneting;}

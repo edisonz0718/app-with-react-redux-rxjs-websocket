@@ -1,4 +1,7 @@
+import $ from "jquery";
+
 import "shared/operators";
+
 import "./app.scss";
 
 import * as services from "./services"; 
@@ -14,6 +17,16 @@ services.server.emitAction$("login",{username: "foo", password: "bar"})
     );
 //-----------------------------------
 // Auth
+const $html = $("html");
+services.usersStore.currentUser$.subscribe(user =>{
+    if(user.isLoggedIn){
+        $html.removeClass("not-logged-in");
+        $html.addClass("logged-in");
+    } else {
+        $html.addClass("not-logged-in");
+        $html.removeClass("logged-in");
+    }
+});
 
 //-----------------------------------
 // Components
@@ -25,8 +38,4 @@ require("./components/playlist/playlist");
 // Bootstrap
 
 services.socket.connect(); 
-/*
-services.usersStore.state$.subscribe(state =>{
-    console.log(state);
-});
-*/
+

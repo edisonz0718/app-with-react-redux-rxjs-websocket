@@ -4,7 +4,7 @@ import {usersStore} from "../../services";
 
 import "./users.scss";
 
-
+//this guy presents the view, it doesn't have control logic.
 class UsersComponent extends ElementComponent {
     constructor(usersStore) {
         super("ul");
