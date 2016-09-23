@@ -6,6 +6,8 @@ import chalk from "chalk";
 import "shared/operators";
 import {ObservableSocket} from "shared/observable-socket";
 
+import {FileRepository} from "./repositories/file";
+
 import {UsersModule} from "./modules/users";
 import {PlaylistModule} from "./modules/playlist";
 import {ChatModule} from "./modules/chat";
@@ -60,7 +62,7 @@ app.get("/", (req,res)=>{
 //Services
 
 const videoServices = [];
-const playlistRepository = {};
+const playlistRepository = new FileRepository("./data/playlist.json");
 //-------------------------------
 //Modules
 const users = new UsersModule(io);
