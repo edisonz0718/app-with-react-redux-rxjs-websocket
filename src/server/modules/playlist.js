@@ -17,8 +17,8 @@ export class PlaylistModule extends ModuleBase {
         
         this._nextSourceId = 1;
         this._playlist =[];
-        this._currentIdex = -1;
-        this._currentSource = null;
+        this._currentIdex = -1; // playlist's current index 
+        this._currentSource = null;// source object
         this._currentTime = 0;
         
         setInterval(this._tickUpdateTime.bind(this),1000);
@@ -68,7 +68,6 @@ export class PlaylistModule extends ModuleBase {
             this.setCurrentSource(null);
             return;
         }
-        
         if(this._currentIdex +1 >= this._playlist.length) //if current is the last, go back to the first one
             this.setCurrentSource(this._playlist[0]);
         else
@@ -146,6 +145,29 @@ export class PlaylistModule extends ModuleBase {
             };
     }
     
+    deleteSourceById(id){
+        const source = this.getSourceById(id);
+        
+        if(!source)
+            throw new Error(`Cannot find source ${id}`);
+        
+        const sourceIndex = this._playlist.indexOf(source);
+ 
+        
+        
+        if(source == this._currentSource)
+            if(this._playlist.length == 1)
+                this.setCurrentSource(null);
+            else
+                this.playNextSource();
+                
+        this._playlist.splice(sourceIndex, 1);
+        if(this._currentSource)// in case there is no more item in playlist
+            this._currentIdex = this._playlist.indexOf(this._currentSource);
+        this._io.emit("playlist:removed", {id});
+        console.log(`playlist: deleted ${source.title}`);
+    }
+    
     registerClient(client) {
         const isLoggedIn = () => this._users.getUserForClient(client) !==null;
         
@@ -162,6 +184,24 @@ export class PlaylistModule extends ModuleBase {
                     return fail("You mush be logged in to do that");
                     
                 return this.addSourceFromUlr$(url);
+            },
+            
+            "playlist:set-current": ({id}) => {
+                if(!isLoggedIn())
+                    return fail("You must be logged in to do that");
+                    
+                const source = this.getSourceById(id);
+                if(!source)
+                    return fail(`Cannot find source ${id}`);
+                    
+                this.setCurrentSource(source);
+            },
+            
+            "playlist:remove": ({id})=>{
+                if(!isLoggedIn())
+                    return fail("You must be logged in to do that");
+                    
+                this.deleteSourceById(id);
             }
         });
     }
