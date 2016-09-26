@@ -144,6 +144,30 @@ export class PlaylistModule extends ModuleBase {
                 time: 0
             };
     }
+    moveSource(fromId, toId) {
+        const fromSource = this.getSourceById(fromId);
+        if(!fromSource)
+            throw new Error(`Could not find "from" source ${fromId}`);
+            
+        let toSource = null;
+        if(toId) {
+            toSource = this.getSourceById(toId);
+            if(!toSource)
+                throw new Error(`Could not find "to" source ${toId}`);
+        }
+        
+        const fromIndex = this._playlist.indexOf(fromSource);
+        this._playlist.splice(fromIndex, 1);
+        
+        const toIndex = toId? this._playlist.indexOf(toSource) + 1: 0;
+        this._playlist.splice(toIndex, 0, fromSource);
+        
+        if(this._currentSource) // sync up currentIndex after source list change
+            this._currentIndex = this._playlist.indexOf(this._currentSource);
+        
+        this._io.emit("playlist:moved", {fromId, toId});
+        console.log(`playlist:moved ${fromSource.title} to ${toSource ? `to after ${toSource.title}`: "to the beginning"}`);
+    }
     
     deleteSourceById(id){
         const source = this.getSourceById(id);
@@ -162,7 +186,7 @@ export class PlaylistModule extends ModuleBase {
                 this.playNextSource();
                 
         this._playlist.splice(sourceIndex, 1);
-        if(this._currentSource)// in case there is no more item in playlist
+        if(this._currentSource)// sync up currentIndex after source list change
             this._currentIdex = this._playlist.indexOf(this._currentSource);
         this._io.emit("playlist:removed", {id});
         console.log(`playlist: deleted ${source.title}`);
@@ -195,6 +219,12 @@ export class PlaylistModule extends ModuleBase {
                     return fail(`Cannot find source ${id}`);
                     
                 this.setCurrentSource(source);
+            },
+            "playlist:move": ({fromId , toId}) => {
+                if(!isLoggedIn())
+                    return fail("You must be logged in to do that");
+                
+                this.moveSource(fromId, toId);
             },
             
             "playlist:remove": ({id})=>{

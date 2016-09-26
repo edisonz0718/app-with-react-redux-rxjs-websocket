@@ -54,6 +54,14 @@ export class PlaylistListComponent extends ElementComponent {
                 this._removeItem(comp);
             });
             
+        this._playlist.actions$
+            .filter(a => a.type == "move")
+            .compSubscribe(this, ({fromSource, toSource}) => {
+                const fromComp = itemsMap[fromSource.id];
+                const toComp = toSource ? itemsMap[toSource.id] : null;
+                this._moveItem(fromComp, toComp);
+            });
+            
         //-------------------------------
         // Current Item
         
@@ -118,6 +126,33 @@ export class PlaylistListComponent extends ElementComponent {
                 comp.detach();
             });
         
+    }
+    
+    _moveItem(fromComp, toComp){
+        const fromOffsetTop = fromComp.$element[0].offsetTop;//jquery [0] will return the DOM element.
+        let distance = 0;
+        
+        
+        if(toComp) {
+            const toOffsetTop = toComp.$element[0].offsetTop;
+            toComp.$element.after(fromComp.$element);
+            
+            distance = fromOffsetTop - toOffsetTop;
+            if(toOffsetTop < fromOffsetTop)
+                distance -= fromComp.$element.height();
+        } else {
+            distance = fromOffsetTop;
+            this.$element.prepend(fromComp.$element);
+        }
+        
+        fromComp.$element
+            .addClass("moving")
+            .css({top: distance})
+            .animate({top: 0}, 250, ()=>{
+                fromComp.$element
+                    .removeClass("moving")
+                    .css({top:""});//remove top attribute from element
+            });
     }
     
 }

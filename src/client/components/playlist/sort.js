@@ -44,9 +44,12 @@ export class PlaylistSortComponent extends ComponentBase {
                 
                 return mouseMove$
                     .startWith(startEvent)
-                    .map(e => $(document.elementFromPoint(e.clientX, e.clientY - halfItemHeight).closest("li")))//bug here. Can't drag outside of top
+                    .map(e => {
+                        const $element = $(document.elementFromPoint(e.clientX, e.clientY - halfItemHeight));
+                        return $element && $element.closest("li");
+                    })//bug here. Can't drag outside of top
                     .map($element => {
-                        const toComp = $element.data("component");
+                        const toComp = $element && $element.data("component");
                         if(target.to == toComp)
                             return target;
                             
@@ -65,10 +68,12 @@ export class PlaylistSortComponent extends ComponentBase {
                         $fromElement.removeClass("dragging");
                         this._$html.removeClass("sorting-playlist");
                     });
-            });
+            })
+            .mergeMap(({from ,to}) => this._playlist.moveSource$(from.source.id , to && to.source.id).catchWrap());
             
         sortOperations$.compSubscribe(this, result => {
-            console.log(result);
+            if(result && result.error)
+                alert(result.error.message || "Unknown Error");
         });
     }
 }
