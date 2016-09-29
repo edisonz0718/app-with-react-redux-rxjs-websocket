@@ -20,7 +20,7 @@ class PlayComponent extends ElementComponent {
         const $title = this._$mount.find("h1");
         
         this._players = {
-            youtube: new YoutubePlayer()
+            youtube: new YoutubePlayer(this._playlist)
         };
         
         for(let type in this._players){
@@ -35,21 +35,24 @@ class PlayComponent extends ElementComponent {
             .toArray() // wait all to be finished
             .compSubscribe(this, this._playersAttached.bind(this));
         
-        this._playlist.serverTime$
-            .compSubscribe(this,({source}) => {
-                if(!source)
+        this._playlist.playerEvent$
+            .compSubscribe(this,({state}) => {
+                if(!state.current.source)
                     return;
                 
-                $title.text(source.title);
+                $title.text(state.current.source.title);
             });
     }
     
     _playersAttached() {
         let lastSource = null,
             lastPlayer = null;
-        this._playlist.serverTime$
-            .compSubscribe(this, ({source,time}) => {
-                if(!source){
+        this._playlist.playerEvent$
+            .compSubscribe(this, ({type,state}) => {
+                const curSource = state.current.source;
+                const curTime = state.current.time;
+                //stop player
+                if(!curSource){
                     if(lastSource){
                         lastPlayer.stop();
                         lastPlayer = lastSource = null;
@@ -57,19 +60,26 @@ class PlayComponent extends ElementComponent {
                     
                     return;
                 }
+                const player = this._players[curSource.type];
+                //pause player
+                if(type == "pause")
+                    player.pause();
                 
-                const player = this._players[source.type];
-                if(source != lastSource){
+                if(type == "resume")
+                    player.resume();
+                //play different source  
+                if(curSource != lastSource){
                     if(lastPlayer && player != lastPlayer){
                         lastPlayer.stop();
                     }
                     
-                    lastSource = source;
+                    lastSource = curSource;
                     lastPlayer = player;
-                    player.play(source, time);
+                    player.play(curSource, curTime);
                 }
-                else if(Math.abs(time - player.currentTime ) > 2)
-                    player.seek(time);
+                // sync up to server time if playing
+                else if(Math.abs(curTime - player.currentTime ) > 2)
+                    player.seek(curTime);
             });
     }
     

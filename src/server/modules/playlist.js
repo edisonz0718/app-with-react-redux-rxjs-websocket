@@ -21,6 +21,8 @@ export class PlaylistModule extends ModuleBase {
         this._currentSource = null;// source object
         this._currentTime = 0;
         
+        this._currentPaused = false;
+        
         setInterval(this._tickUpdateTime.bind(this),1000);
         setInterval(this._tickUpdateClients.bind(this),5000);
     }
@@ -118,18 +120,21 @@ export class PlaylistModule extends ModuleBase {
             
         console.log(`playlist: added ${source.title}`);
     }
-    
+    //update time every sec
     _tickUpdateTime() {
+        //auto play when first started
         if(this._currentSource == null){
             if(this._playlist.length)
                 this.setCurrentSource(this._playlist[0]);
         } else {
-            this._currentTime++;
+            if(!this._currentPaused)
+                this._currentTime++;
+            // play next source if current source ends.
             if(this._currentTime > this._currentSource.totalTime + 2)
                 this.playNextSource();
         }
     }
-    
+    //update info to clients every 5 secs
     _tickUpdateClients() {
         this._io.emit("playlist:current", this._createCurrentEvent());
     }
@@ -192,6 +197,22 @@ export class PlaylistModule extends ModuleBase {
         console.log(`playlist: deleted ${source.title}`);
     }
     
+    pauseSource(){
+        if(!this._currentSource)
+            throw new Error(`No current playing source to be paused`); 
+        this._currentPaused = true;    
+        this._io.emit("player:pause", null);
+        console.log(`player: pause current source`);
+    }
+    
+    resumeSource(){
+        if(!this._currentSource)
+            throw new Error(`No current paused source to be resumed`); 
+        this._currentPaused = false;    
+        this._io.emit("player:resume", null);
+        console.log(`player: resume current source`);
+    }
+    
     registerClient(client) {
         const isLoggedIn = () => this._users.getUserForClient(client) !==null;
         
@@ -232,6 +253,13 @@ export class PlaylistModule extends ModuleBase {
                     return fail("You must be logged in to do that");
                     
                 this.deleteSourceById(id);
+            },
+            "player:paused": () =>{
+                this.pauseSource(); 
+            },
+            
+            "player:resumed": () =>{
+                this.resumeSource(); 
             }
         });
     }

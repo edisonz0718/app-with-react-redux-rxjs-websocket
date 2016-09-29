@@ -17,7 +17,9 @@ export class PlaylistStore {
             server.on$("playlist:added").map(opAdd),
             server.on$("playlist:current").map(opCurrent),
             server.on$("playlist:removed").map(opRemove),
-            server.on$("playlist:moved").map(opMove));
+            server.on$("playlist:moved").map(opMove),
+            server.on$("player:pause").map(opPause),
+            server.on$("player:resume").map(opResume));
             
         this.actions$ = events$
             .scan(({state},op) =>op(state), {state:defaultState})
@@ -31,10 +33,15 @@ export class PlaylistStore {
             .filter(a => a.type == "current")
             .map(a => a.state.current)
             .publishReplay(1);
+            
+        this.playerEvent$ = this.actions$
+            .filter(a => a.type == "current" || a.type == "pause" || a.type =="resume")
+            .publishReplay(1);           
         
         this.actions$.connect(); 
         this.state$.connect();
         this.serverTime$.connect();
+        this.playerEvent$.connect();
             
         server.on("connect", () =>{
             server.emitAction$("playlist:list")
@@ -65,6 +72,14 @@ export class PlaylistStore {
             return Observable.empty();
         
         return this._server.emitAction$("playlist:move", {fromId, toId});
+    }
+    
+    pauseSource$(){
+        return this._server.emitAction$("player:paused", null); 
+    }
+    
+    resumeSource$(){
+        return this._server.emitAction$("player:resumed", null);
     }
 }
 
@@ -138,7 +153,7 @@ function opCurrent({id, time}){
     };
 }
 
-function opRemove ({id}){
+function opRemove({id}){
     return state => {
         const source = state.map[id];
         if(!source)
@@ -182,6 +197,31 @@ function opMove({fromId, toId}){
             state: state
         };
     };
+}
+
+function opPause() {
+    return state =>{
+        if(!state.current.source)
+            return opError(state, `No current source to be paused`); 
+        return {
+            type: "pause",
+            state: state
+        };       
+    };
+
+}
+
+
+function opResume() {
+    return state =>{
+        if(!state.current.source)
+            return opError(state, `No current source to be resumed`); 
+        return {
+            type: "resume",
+            state: state
+        };       
+    };
+
 }
 
 function opError(state, error) {

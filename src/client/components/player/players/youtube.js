@@ -8,8 +8,9 @@ export class YoutubePlayer extends ElementComponent {
         return  this._player.getCurrentTime();
     }
     
-    constructor(){
+    constructor(playlistStore){
         super(); 
+        this._playlist = playlistStore;
     }
     
     _onAttach(){
@@ -18,7 +19,7 @@ export class YoutubePlayer extends ElementComponent {
     
     init$() {
         this.$element.hide();
-        const $playerElement = $(`<div />`).appendTo(this.$element);
+        const $playerElement = $(`<div />`).appendTo(this.$element);//required by youtube iframe api
         return new Observable(observer =>{
             window.onYouTubeIframeAPIReady = () => {
                 this._player = new window.YT.Player($playerElement[0], {
@@ -35,6 +36,12 @@ export class YoutubePlayer extends ElementComponent {
                     events: {
                         onReady: () => {
                             observer.complete();
+                        },
+                        onStateChange: e =>{
+                            if(e.data == window.YT.PlayerState.PAUSED) 
+                                this.paused();
+                            else if(e.data == window.YT.PlayerState.PLAYING)
+                                this.played();
                         }
                     }
                 });
@@ -53,8 +60,30 @@ export class YoutubePlayer extends ElementComponent {
         this.$element.hide();
         this._player.pauseVideo();
     }
+    pause(){
+        this._player.pauseVideo();       
+    }
+    resume(){
+        this._player.playVideo();
+    }
     
     seek(time) {
         this._player.seekTo(time);
+    }
+    paused(){
+        this._playlist.pauseSource$()
+            .catchWrap()
+            .compSubscribe(this, result =>{
+                if(result && result.error)
+                    alert(result.error.message || "Unknown Error");
+            }); 
+    }
+    played(){
+        this._playlist.resumeSource$()
+            .catchWrap()
+            .compSubscribe(this, result=>{
+                if(result && result.error)
+                    alert(result.error.message || "Unknown Error");
+            });
     }
 }

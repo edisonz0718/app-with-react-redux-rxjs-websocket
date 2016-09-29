@@ -100,6 +100,8 @@ export class ObservableSocket {
     
     //---------------
     //on (Server Side)
+    
+    //response to requester , not all subscriber
     onAction(action ,callback){
         this._socket.on(action, (arg,requestId)=>{
             try{
