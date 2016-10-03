@@ -8,11 +8,11 @@ import {validateAddSource} from "shared/validation/playlist";
 
 
 export class PlaylistModule extends ModuleBase {
-    constructor(io, usersModule, playlistRepository, videoServices){
+    constructor(io, usersModule, postgresPool, videoServices){
         super();
         this._io = io;
         this._users = usersModule;
-        this._repository = playlistRepository;
+        this._repository = postgresPool;
         this._services = videoServices;
         
         this._nextSourceId = 1;
@@ -40,8 +40,10 @@ export class PlaylistModule extends ModuleBase {
     setPlaylist(playlist){
         this._playlist = playlist;
         
+       /* 
         for(let source of playlist)
             source.id = this._nextSourceId++;
+       */
             
         this._io.emit("playlist:list", this._playlist);
     }
@@ -84,7 +86,8 @@ export class PlaylistModule extends ModuleBase {
             
         return new Observable(observer => {
             let getSource$ = null;
-            
+            //youtube service etc. , 
+            //validation and get source info,return back source observable
             for(let service of this._services){
                 getSource$ = service.process$(url);
                 
@@ -100,7 +103,7 @@ export class PlaylistModule extends ModuleBase {
                 .subscribe(observer); // this is the way to chain observable
         });
     }
-    
+    //FIXME: need to add source to DB 
     addSource(source) {
         source.id = this._nextSourceId++;
        

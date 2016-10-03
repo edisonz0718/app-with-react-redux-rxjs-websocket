@@ -6,7 +6,8 @@ import chalk from "chalk";
 import "shared/operators";
 import {ObservableSocket} from "shared/observable-socket";
 
-import {FileRepository} from "./repositories/file";
+//import {FileRepository} from "./repositories/file";
+import {PostgresPool} from "./repositories/postgres"; 
 import {YoutubeService} from "./services/youtube";
 
 import {UsersModule} from "./modules/users";
@@ -60,15 +61,37 @@ app.get("/", (req,res)=>{
     });
 });
 //-------------------------------
+//DATABASE setup
+const config = {
+    user: "ubuntu",
+    database: "realTimeApp",
+    password: "edisonz0718",
+    host: "localhost",
+//    port: 5432,
+    max: 5,
+    idleTimeoutMillis: 30000
+};
+
+const postgresPool = new PostgresPool(config);
+
+
+//-------------------------------
 //Services
 
 const videoServices = [new YoutubeService("AIzaSyAjM_FTv9vlVEHx6HJTugtAfwmmuzT8HHo")];
+/*
 const playlistRepository = new FileRepository("./data/playlist.json");
+playlistRepository
+    .getAll$()
+    .subscribe(playlist => {
+        playlist.forEach(item =>postgresPool.insertJSON$(item).subscribe());
+    });
+*/
 //-------------------------------
 //Modules
 const users = new UsersModule(io);
 const chat  = new ChatModule(io , users);
-const playlist = new PlaylistModule(io , users , playlistRepository, videoServices);
+const playlist = new PlaylistModule(io , users , postgresPool/*playlistRepository*/, videoServices);
 const modules = [users, chat ,playlist];
 //-------------------------------
 //Socket
