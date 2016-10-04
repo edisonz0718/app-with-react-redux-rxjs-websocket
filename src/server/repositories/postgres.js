@@ -1,9 +1,10 @@
 import {Pool} from "pg";
 import {Observable} from "rxjs";
+import uuid from "node-uuid";
 
-//const connectDB = Observable.bindNodeCallback(Pool.connect);
-//const queryDB = Observable.bindNodeCallback(Client.query);
-
+//Postgress should handle uuid key generation and error handling for key collision.
+//Then return the id to playlist model.This is async so model needs to sync up
+// the correct key.
 
 export class PostgresPool {
     constructor(config){
@@ -26,15 +27,26 @@ export class PostgresPool {
     }
     
     insertJSON$(obj){
+        this.newId = uuid.v1();// newId should be used to emit back to client
         return Observable.fromPromise(this._pool.query(`INSERT INTO 
-            source( type, url, thumb, title, totalTime)
-            VALUES( $1 , $2  ,$3 ,$4, $5 )`,
-            [obj.type, obj.url, obj.thumb, obj.title, obj.totalTime]))
+            source(id, type, url, thumb, title, totalTime)
+            VALUES( $1 , $2  ,$3 ,$4, $5, $6 )`,
+            [this.newId,obj.type, obj.url, obj.thumb, obj.title, obj.totalTime]))
             .catch(e => {
-                console.error(`PostgresPool: failed to get database: ${e.stack || e}`);
+                console.error(`PostgresPool : failed to get database: ${e.stack || e}`);
                 return Observable.throw(e);
             })
-            .do(res => console.log(res));
+            .do(console.log("PostgresPool : INSERT COMPLETE!"));
+    }
+    
+    deleteRow$(obj){
+        return Observable.fromPromise(this._pool.query(`DELETE FROM
+            source WHERE id=$1`,[obj.id]))
+            .catch(e => {
+                console.error(`PostgresPool : failed to delete row ${obj.title}: ${e.stack || e}`);
+                return Observable.throw(e);
+            })
+            .do(console.log("PostgresPool : DELETE ROW COMPLETE!"));
     }
     
 }

@@ -105,8 +105,10 @@ export class PlaylistModule extends ModuleBase {
     }
     //FIXME: need to add source to DB 
     addSource(source) {
-        source.id = this._nextSourceId++;
+        //source.id = this._nextSourceId++;
        
+        source.id = this.insertDB$(source);  
+        
         let insertIndex = 0,
             afterId = -1;
         
@@ -123,6 +125,13 @@ export class PlaylistModule extends ModuleBase {
             
         console.log(`playlist: added ${source.title}`);
     }
+    
+    insertDB$(source){
+        
+        this._repository.insertJSON$(source)
+            .subscribe();
+        return this._repository.newId;
+    }
     //update time every sec
     _tickUpdateTime() {
         //auto play when first started
@@ -133,7 +142,7 @@ export class PlaylistModule extends ModuleBase {
             if(!this._currentPaused)
                 this._currentTime++;
             // play next source if current source ends.
-            if(this._currentTime > this._currentSource.totalTime + 2)
+            if(this._currentTime > this._currentSource.totaltime + 2)
                 this.playNextSource();
         }
     }
@@ -182,6 +191,8 @@ export class PlaylistModule extends ModuleBase {
         
         if(!source)
             throw new Error(`Cannot find source ${id}`);
+            
+        this.deleteFromDB$(source);
         
         const sourceIndex = this._playlist.indexOf(source);
  
@@ -198,6 +209,12 @@ export class PlaylistModule extends ModuleBase {
             this._currentIdex = this._playlist.indexOf(this._currentSource);
         this._io.emit("playlist:removed", {id});
         console.log(`playlist: deleted ${source.title}`);
+    }
+    
+    deleteFromDB$(source){
+        
+        this._repository.deleteRow$(source)
+            .subscribe();
     }
     
     pauseSource(){

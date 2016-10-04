@@ -234,5 +234,5 @@ function opError(state, error) {
 }
 
 function calculateProgress(time, source){
-    return Math.floor(Math.min(time / source.totalTime, 1) * 100);
+    return Math.floor(Math.min(time / source.totaltime, 1) * 100);
 }

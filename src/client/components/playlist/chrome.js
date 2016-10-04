@@ -22,9 +22,9 @@ export class PlaylistChromeComponent extends ComponentBase {
         this._playlist.state$.first()
             .merge(updateActions$)
             .compSubscribe(this, ({state}) => {
-                const totalTime = state.list.reduce((time,source) => time + source.totalTime, 0);
+                const totaltime = state.list.reduce((time,source) => time + source.totaltime, 0);
                 $title.text(`${state.list.length} item${state.list.length == 1 ? "": "s"}`);
-                $stats.text(moment.duration(totalTime, "seconds").format());
+                $stats.text(moment.duration(totaltime, "seconds").format());
             });
             
         const $indicator = $(`<div class="playing-indicator" />`).appendTo(this._$mount);

@@ -182,7 +182,7 @@ class PlaylistItemComponent extends ElementComponent {
         const $details = 
             $(`<div class="details" />`).append([
                 $(`<span class="title" />`).attr("title", source.title).text(source.title),
-                $(`<time />`).text(moment.duration(source.totalTime,"seconds").format())
+                $(`<time />`).text(moment.duration(source.totaltime,"seconds").format())
             ]);
             
         this._$progress = $(`<span class="progress" />`);
