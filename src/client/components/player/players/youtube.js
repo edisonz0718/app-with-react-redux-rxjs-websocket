@@ -27,10 +27,12 @@ export class YoutubePlayer extends ElementComponent {
                     height: "100%",
                     videoId: "",
                     playerVars: {
+                        autohide: 1,
                         disablekb: 1,
                         enablejsapi: 1,
                         modestbranding: 1,
                         iv_load_policy: 3,
+                        //controls:0,
                         rel: 0
                     },
                     events: {
@@ -42,6 +44,12 @@ export class YoutubePlayer extends ElementComponent {
                                 this.paused();
                             else if(e.data == window.YT.PlayerState.PLAYING)
                                 this.played();
+                            else if(e.data == window.YT.PlayerState.ENDED)
+                                console.log("IT'S ENDED");
+                            else if(e.data == window.YT.PlayerState.BUFFERING)
+                                console.log("IT'S BUFFERING");                               
+                            else if(e.data == window.YT.PlayerState.CUED)
+                                console.log("IT'S CUED");                                                              
                         }
                     }
                 });
