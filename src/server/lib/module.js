@@ -7,7 +7,7 @@ export class ModuleBase {
     }
     
     registerClient(client){
-        
+        this._clientList.push(client);
     }
     
     clientRegistered(client){

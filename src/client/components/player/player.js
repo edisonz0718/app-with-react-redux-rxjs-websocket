@@ -51,7 +51,7 @@ class PlayComponent extends ElementComponent {
             .compSubscribe(this, ({type,state}) => {
                 const curSource = state.current.source;
                 const curTime = state.current.time;
-                //stop player
+                //stop player when no items in the list
                 if(!curSource){
                     if(lastSource){
                         lastPlayer.stop();
@@ -68,7 +68,12 @@ class PlayComponent extends ElementComponent {
                 if(type == "resume")
                     player.resume();
                 //play different source  
-                if(curSource != lastSource){
+                if(!lastSource && state.list.length){
+                    lastSource = curSource;
+                    lastPlayer = player;                   
+                    player.cue(curSource, curTime);
+                }//init
+                else if(curSource != lastSource){
                     if(lastPlayer && player != lastPlayer){
                         lastPlayer.stop();
                     }
@@ -80,6 +85,7 @@ class PlayComponent extends ElementComponent {
                 // sync up to server time if playing
                 else if(Math.abs(curTime - player.currentTime ) > 2)
                     player.seek(curTime);
+                    
             });
     }
     

@@ -39,12 +39,12 @@ export class PlaylistListComponent extends ElementComponent {
         
         this._playlist.actions$
             .filter(a => a.type === "add")
-            .compSubscribe(this, ({source, addAfter}) => {
+            .compSubscribe(this, ({source}) => {
                 const comp = new PlaylistItemComponent(source);
                 comp.attach($list);
                 
                 itemsMap[source.id] = comp;
-                this._addItem(comp, addAfter? itemsMap[addAfter.id]: null);
+                this._addItem(comp);
             });
             
         this._playlist.actions$
@@ -97,16 +97,19 @@ export class PlaylistListComponent extends ElementComponent {
                     this._$mount.animate({scrollTop});
                 }
                 
-                currentComp.progress = current.progress;
+                currentComp.progress = current.progress;// pass current.progress from playlist store to the playlistItem's progress setter.
             });
             
     }
     
-    _addItem(comp, addAfterComp) {
+    _addItem(comp) {
+        
+    /*
         if(addAfterComp)
             addAfterComp.$element.after(comp.$element);
         else
-            this.$element.prepend(comp.$element);
+    */
+        this.$element.append(comp.$element);
             
         const oldHeight = comp.$element.height();
         comp.$element

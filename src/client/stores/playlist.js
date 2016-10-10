@@ -100,8 +100,9 @@ function opList(sources){
     
 }
 
-function opAdd({source,afterId}){
+function opAdd({source}){
     return state => {
+ /*
         let insertIndex = 0,
             addAfter =null;
             
@@ -112,22 +113,24 @@ function opAdd({source,afterId}){
             const afterIndex = state.list.indexOf(addAfter);
             insertIndex = afterIndex + 1;
         }
-        
+      
         state.list.splice(insertIndex, 0 , source);
+ */
+        state.list.push(source);
         state.map[source.id] = source;
         return {
             type: "add",
             source: source,
-            addAfter: addAfter,
+//            addAfter: addAfter,
             state: state
         };
     };
 }
 
-function opCurrent({id, time}){
+function opCurrent({id, time, paused}){
     return state => {
         if(id == null){
-            state.current = {source : null, time: 0 , progress: 0};
+            state.current = {source : null, time: 0 , progress: 0, paused};
         } else {
              
             const source = state.map[id];
@@ -138,11 +141,13 @@ function opCurrent({id, time}){
                 state.current = {
                     source : source,
                     time : time,
-                    progress : calculateProgress(time,source)
+                    progress : calculateProgress(time,source),
+                    paused
                 };
             } else {
                 state.current.time = time;
                 state.current.progress = calculateProgress(time,source);
+                state.current.paused = paused;
             }
         } 
         return {
@@ -212,10 +217,12 @@ function opPause() {
 }
 
 
-function opResume() {
+function opResume({paused}) {
     return state =>{
         if(!state.current.source)
             return opError(state, `No current source to be resumed`); 
+            
+        state.current.paused = paused;
         return {
             type: "resume",
             state: state

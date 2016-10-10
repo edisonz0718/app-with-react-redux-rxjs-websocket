@@ -81,7 +81,6 @@ export class ObservableSocket {
             const request = this._popRequest(id); 
             if(!request)
                 return;
-            
             request.error(arg);
         });
         this._actionCallbacks[action] = true;
@@ -136,7 +135,6 @@ export class ObservableSocket {
             catch(error){
                 if(typeof(requestId) !=="undefined")
                     this._emitError(action,requestId,error);
-                    
                 console.error(error.stack || error);
             } 
         }); 

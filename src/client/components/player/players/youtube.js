@@ -1,11 +1,18 @@
 import {Observable} from "rxjs";
 import $ from "jquery";
 
+import "./youtube.scss";
+
 import {ElementComponent} from "../../../lib/component";
+
+import {YoutubeControl} from "./youtubeControl";
 
 export class YoutubePlayer extends ElementComponent {
     get currentTime() {
         return  this._player.getCurrentTime();
+    }
+    get playerState(){
+        return this._player.getPlayerState();
     }
     
     constructor(playlistStore){
@@ -15,11 +22,17 @@ export class YoutubePlayer extends ElementComponent {
     
     _onAttach(){
         this.$element.addClass("player youtube");
+        
+        this.youtubeControl = new YoutubeControl(this._playlist, this);
+        this.youtubeControl.attach(this.$element);
+        this.children.push(this.youtubeControl);
+        
     }
     
     init$() {
         this.$element.hide();
-        const $playerElement = $(`<div />`).appendTo(this.$element);//required by youtube iframe api
+        const $playerElement = $(`<div id="myplayer"/>`).appendTo(this.$element);//required by youtube iframe api
+        const $playIcon = this.youtubeControl.$playBtn.find("i"); 
         return new Observable(observer =>{
             window.onYouTubeIframeAPIReady = () => {
                 this._player = new window.YT.Player($playerElement[0], {
@@ -27,6 +40,7 @@ export class YoutubePlayer extends ElementComponent {
                     height: "100%",
                     videoId: "",
                     playerVars: {
+                        controls: 0,
                         autohide: 1,
                         disablekb: 1,
                         enablejsapi: 1,
@@ -38,12 +52,22 @@ export class YoutubePlayer extends ElementComponent {
                     events: {
                         onReady: () => {
                             observer.complete();
+
                         },
                         onStateChange: e =>{
-                            if(e.data == window.YT.PlayerState.PAUSED) 
+                            if(e.data == window.YT.PlayerState.PAUSED){ 
                                 this.paused();
-                            else if(e.data == window.YT.PlayerState.PLAYING)
+                                console.log("IT'S PAUSED");                                                              
+                                $playIcon.addClass("fa-play");
+                                $playIcon.removeClass("fa-pause");  
+                                //document.querySelector(".youtube").webkitRequestFullscreen();
+                            }
+                            else if(e.data == window.YT.PlayerState.PLAYING){
                                 this.played();
+                                console.log("IT'S PLAYING");                               
+                                $playIcon.addClass("fa-pause");
+                                $playIcon.removeClass("fa-play");  
+                            }
                             else if(e.data == window.YT.PlayerState.ENDED)
                                 console.log("IT'S ENDED");
                             else if(e.data == window.YT.PlayerState.BUFFERING)
@@ -62,6 +86,10 @@ export class YoutubePlayer extends ElementComponent {
     play(source, time){
         this.$element.show();
         this._player.loadVideoById(source.url, time);
+    }
+    cue(source, time){
+        this.$element.show();
+        this._player.cueVideoById(source.url, time);
     }
     
     stop() {

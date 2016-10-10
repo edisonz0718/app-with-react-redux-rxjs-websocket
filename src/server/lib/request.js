@@ -9,7 +9,6 @@ export function getJson$(url) {
                 observer.error(error);
                 return;
             }
-            
             observer.next(JSON.parse(body));
             observer.complete();
         });

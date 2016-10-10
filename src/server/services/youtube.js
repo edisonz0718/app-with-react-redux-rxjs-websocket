@@ -16,14 +16,14 @@ export class YoutubeService {
         const match = _(YOUTUBE_REGEXES)
             .map(r=>url.match(r))
             .find(a => a!=null);
-            
+        // match[0] is the entire match result. match[1] is the capture.    
         return match ? this.getSourceFromId$(match[1]) : null;
     }
     
     getSourceFromId$(id) {
         return getJson$(this._buildGetVideoUrl(id))
             .mergeMap(data => {
-                if(!data || data.items.length !=1)
+                if(!data || !data.items || data.items.length !=1)
                     return fail(`Cannot locate youtube video ${id}`);
                     
                 const {id, snippet, contentDetails} = data.items[0];
@@ -32,7 +32,7 @@ export class YoutubeService {
                     thumb: snippet.thumbnails.default.url,
                     url: id,
                     title: snippet.title || "{No Title}",
-                    totalTime: moment.duration(contentDetails.duration).asSeconds()
+                    totaltime: moment.duration(contentDetails.duration).asSeconds()
                 });
             });
     }

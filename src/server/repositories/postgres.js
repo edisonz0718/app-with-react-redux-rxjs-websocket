@@ -14,7 +14,7 @@ export class PostgresPool {
     } 
     
     getAll$(){
-        return Observable.fromPromise(this._pool.query(`SELECT * FROM source`)) 
+        return Observable.fromPromise(this._pool.query(`SELECT * FROM source ORDER BY "order"`)) 
             //.mergeMap(client => Observable.fromPromise(client.query(`SELECT * FROM source`)))
             //.mergeMap(query =>query(`SELCET * FROM source`))
             .catch(e => {
@@ -29,11 +29,11 @@ export class PostgresPool {
     insertJSON$(obj){
         this.newId = uuid.v1();// newId should be used to emit back to client
         return Observable.fromPromise(this._pool.query(`INSERT INTO 
-            source(id, type, url, thumb, title, totalTime)
-            VALUES( $1 , $2  ,$3 ,$4, $5, $6 )`,
-            [this.newId,obj.type, obj.url, obj.thumb, obj.title, obj.totalTime]))
+            source(id, type, url, thumb, title, totalTime, "order")
+            VALUES( $1 , $2  ,$3 ,$4, $5, $6 , $7)`,
+            [this.newId,obj.type, obj.url, obj.thumb, obj.title, obj.totaltime, obj.order]))
             .catch(e => {
-                console.error(`PostgresPool : failed to get database: ${e.stack || e}`);
+                console.error(`PostgresPool : failed to insert database: ${e.stack || e}`);
                 return Observable.throw(e);
             })
             .do(console.log("PostgresPool : INSERT COMPLETE!"));
@@ -48,6 +48,15 @@ export class PostgresPool {
             })
             .do(console.log("PostgresPool : DELETE ROW COMPLETE!"));
     }
+    updateRow$(obj){
+        return Observable.fromPromise(this._pool.query(`UPDATE
+            source SET "order" = $1 WHERE id=$2`,[obj.order,obj.id]))
+            .catch(e => {
+                console.error(`PostgresPool : failed to update row ${obj.title}: ${e.stack || e}`);
+                return Observable.throw(e);
+            })
+            .do(console.log("PostgresPool : DELETE ROW COMPLETE!"));
+    }   
     
 }
 /*

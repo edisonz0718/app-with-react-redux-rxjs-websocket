@@ -67,6 +67,7 @@ export class PlaylistContextMenuComponent extends ElementComponent {
             });
         
         const setCurrentItem$ = Observable.fromEventNoDefault($playButton, "click")
+            //.do(()=>document.querySelector(".youtube").webkitRequestFullscreen())
             .map(()=> comp=> this._playlist.setCurrentSource$(comp.source));
             
         const deleteItem$ = Observable.fromEventNoDefault($deleteButton, "click")

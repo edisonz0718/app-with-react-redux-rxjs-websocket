@@ -24,7 +24,7 @@ export class PlaylistModule extends ModuleBase {
         this._currentPaused = false;
         
         setInterval(this._tickUpdateTime.bind(this),1000);
-        setInterval(this._tickUpdateClients.bind(this),5000);
+        setInterval(this._tickUpdateClients.bind(this),2000);
     }
     
     init$() {                             //equal: playlist =>this.setPlaylist(playlist)
@@ -39,7 +39,7 @@ export class PlaylistModule extends ModuleBase {
                                             
     setPlaylist(playlist){
         this._playlist = playlist;
-        
+        this._maxOrder = this._playlist[this._playlist.length - 1].order;
        /* 
         for(let source of playlist)
             source.id = this._nextSourceId++;
@@ -83,6 +83,9 @@ export class PlaylistModule extends ModuleBase {
         const validator = validateAddSource(url);
         if(!validator)
             return validator.throw$();
+        //only support 500 max playlist items    
+        if(this._playlist.length >= 500)
+            return fail(`Sorry, We are not able to add more items for you. The theater has reached the limit of 500 items.`);
             
         return new Observable(observer => {
             let getSource$ = null;
@@ -103,27 +106,36 @@ export class PlaylistModule extends ModuleBase {
                 .subscribe(observer); // this is the way to chain observable
         });
     }
-    //FIXME: need to add source to DB 
+    
     addSource(source) {
         //source.id = this._nextSourceId++;
        
-        source.id = this.insertDB$(source);  
-        
+/*        
         let insertIndex = 0,
             afterId = -1;
         
         if(this._currentSource){
             afterId = this._currentSource.id;
+            source.order = this._currentSource.order; 
             insertIndex = this._currentIdex + 1;
         }
+*/
+        source.order = ++this._maxOrder;
+        source.id = this.insertDB$(source);  
         
-        this._playlist.splice(insertIndex, 0 , source);
-        this._io.emit("playlist:added",{source, afterId});
-        
-        if(!this._currentSource)
+        if(!this._currentSource) 
             this.setCurrentSource(source);
             
+        this._playlist.push(source);
+        this._io.emit("playlist:added",{source});
+        
+        //if(!this._currentSource)
+            
         console.log(`playlist: added ${source.title}`);
+        if(this._maxOrder >= 10000){
+            //update all entries' order to start from 1.
+            return fail(`max order larger than 10000`); 
+        }
     }
     
     insertDB$(source){
@@ -155,10 +167,12 @@ export class PlaylistModule extends ModuleBase {
         return this._currentSource
             ? {
                 id: this._currentSource.id,
-                time: this._currentTime
+                time: this._currentTime,
+                paused: this._currentPaused
             } : {
                 id: null,
-                time: 0
+                time: 0,
+                paused: this._currentPaused
             };
     }
     moveSource(fromId, toId) {
@@ -171,13 +185,25 @@ export class PlaylistModule extends ModuleBase {
             toSource = this.getSourceById(toId);
             if(!toSource)
                 throw new Error(`Could not find "to" source ${toId}`);
+
+        }
+        const toIndex = toId? this._playlist.indexOf(toSource): 0;
+        const toOrder = this._playlist[toIndex].order;
+        const orderGap = toIndex ? this._playlist[toIndex+1].order - toOrder: toOrder;
+        if(orderGap<=0)
+            throw new Error(`The order of playlist is incorrect orderGap = ${orderGap}`);
+        fromSource.order = toIndex ? toOrder + (orderGap>>1) : toOrder>>1;
+        if(fromSource.order <=100){
+            throw new Error(`order too close to each other, need to reset order`);  
+        }else{
+            this.updateDB$(fromSource);     
         }
         
         const fromIndex = this._playlist.indexOf(fromSource);
         this._playlist.splice(fromIndex, 1);
-        
-        const toIndex = toId? this._playlist.indexOf(toSource) + 1: 0;
-        this._playlist.splice(toIndex, 0, fromSource);
+        //if toId , add after toId , otherwise insert before the first one. 
+        const insertIndex = toId? toIndex + 1: 0;
+        this._playlist.splice(insertIndex, 0, fromSource);
         
         if(this._currentSource) // sync up currentIndex after source list change
             this._currentIndex = this._playlist.indexOf(this._currentSource);
@@ -216,6 +242,11 @@ export class PlaylistModule extends ModuleBase {
         this._repository.deleteRow$(source)
             .subscribe();
     }
+    updateDB$(source){
+        
+        this._repository.updateRow$(source)
+            .subscribe();
+    }   
     
     pauseSource(){
         if(!this._currentSource)
@@ -229,7 +260,7 @@ export class PlaylistModule extends ModuleBase {
         if(!this._currentSource)
             throw new Error(`No current paused source to be resumed`); 
         this._currentPaused = false;    
-        this._io.emit("player:resume", null);
+        this._io.emit("player:resume", {paused: this._currentPaused});
         console.log(`player: resume current source`);
     }
     
@@ -279,7 +310,8 @@ export class PlaylistModule extends ModuleBase {
             },
             
             "player:resumed": () =>{
-                this.resumeSource(); 
+                if(this._currentPaused)
+                    this.resumeSource(); 
             }
         });
     }

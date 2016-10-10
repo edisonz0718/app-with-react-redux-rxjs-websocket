@@ -20,6 +20,13 @@ $fa-font-path: "~font-awesome/fonts";
     }
 }
 
+::-webkit-full-screen {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background: none;
+}
+
 
 html,body {
     height: 100%;
