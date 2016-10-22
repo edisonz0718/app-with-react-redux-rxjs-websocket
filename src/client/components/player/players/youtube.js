@@ -14,9 +14,16 @@ export class YoutubePlayer extends ElementComponent {
     get playerState(){
         return this._player.getPlayerState();
     }
+    get bufProgress(){
+        if(this._ready)
+            return this._player.getVideoLoadedFraction()*100;
+        else
+            return 0;
+    }
     
     constructor(playlistStore){
         super(); 
+        this._ready = false;
         this._playlist = playlistStore;
     }
     
@@ -51,29 +58,32 @@ export class YoutubePlayer extends ElementComponent {
                     },
                     events: {
                         onReady: () => {
+                            this._ready = true;
                             observer.complete();
 
                         },
                         onStateChange: e =>{
                             if(e.data == window.YT.PlayerState.PAUSED){ 
                                 this.paused();
-                                console.log("IT'S PAUSED");                                                              
+                                //console.log("IT'S PAUSED");                                                              
                                 $playIcon.addClass("fa-play");
                                 $playIcon.removeClass("fa-pause");  
                                 //document.querySelector(".youtube").webkitRequestFullscreen();
                             }
                             else if(e.data == window.YT.PlayerState.PLAYING){
                                 this.played();
-                                console.log("IT'S PLAYING");                               
+                                //console.log("IT'S PLAYING");                               
                                 $playIcon.addClass("fa-pause");
                                 $playIcon.removeClass("fa-play");  
                             }
+                            /*
                             else if(e.data == window.YT.PlayerState.ENDED)
                                 console.log("IT'S ENDED");
                             else if(e.data == window.YT.PlayerState.BUFFERING)
                                 console.log("IT'S BUFFERING");                               
                             else if(e.data == window.YT.PlayerState.CUED)
                                 console.log("IT'S CUED");                                                              
+                            */
                         }
                     }
                 });

@@ -22,9 +22,11 @@ export class PlaylistModule extends ModuleBase {
         this._currentTime = 0;
         
         this._currentPaused = false;
+        this._jumped = false;
         
-        setInterval(this._tickUpdateTime.bind(this),1000);
-        setInterval(this._tickUpdateClients.bind(this),2000);
+
+        setInterval(this._tickUpdateTime.bind(this),500);
+        //setInterval(this._tickUpdateClients.bind(this),2000);
     }
     
     init$() {                             //equal: playlist =>this.setPlaylist(playlist)
@@ -144,7 +146,7 @@ export class PlaylistModule extends ModuleBase {
             .subscribe();
         return this._repository.newId;
     }
-    //update time every sec
+    //update time every 0.1 sec
     _tickUpdateTime() {
         //auto play when first started
         if(this._currentSource == null){
@@ -152,15 +154,17 @@ export class PlaylistModule extends ModuleBase {
                 this.setCurrentSource(this._playlist[0]);
         } else {
             if(!this._currentPaused)
-                this._currentTime++;
+                this._currentTime+=0.5;
             // play next source if current source ends.
             if(this._currentTime > this._currentSource.totaltime + 2)
                 this.playNextSource();
         }
+        this._tickUpdateClients();
     }
-    //update info to clients every 5 secs
+    //update info to clients 
     _tickUpdateClients() {
         this._io.emit("playlist:current", this._createCurrentEvent());
+        this._jumped = false;
     }
     
     _createCurrentEvent() {
@@ -168,11 +172,17 @@ export class PlaylistModule extends ModuleBase {
             ? {
                 id: this._currentSource.id,
                 time: this._currentTime,
-                paused: this._currentPaused
+                opState : {
+                    paused: this._currentPaused,
+                    jumped: this._jumped
+                }
             } : {
                 id: null,
                 time: 0,
-                paused: this._currentPaused
+                opState : {
+                    paused: this._currentPaused,   
+                    jumped: this._jumped
+                }
             };
     }
     moveSource(fromId, toId) {
@@ -193,7 +203,7 @@ export class PlaylistModule extends ModuleBase {
         if(orderGap<=0)
             throw new Error(`The order of playlist is incorrect orderGap = ${orderGap}`);
         fromSource.order = toIndex ? toOrder + (orderGap>>1) : toOrder>>1;
-        if(fromSource.order <=100){
+        if(fromSource.order <=100 || orderGap <=100){
             throw new Error(`order too close to each other, need to reset order`);  
         }else{
             this.updateDB$(fromSource);     
@@ -264,6 +274,23 @@ export class PlaylistModule extends ModuleBase {
         console.log(`player: resume current source`);
     }
     
+    playPrevious(){
+        if(!this._currentSource)
+            throw new Error(`No current source`); 
+        if(this._currentIdex>0)
+            this.setCurrentSource(this._playlist[this._currentIdex-1]);
+        else
+            this.setCurrentSource(this._playlist[this._playlist.length -1]);
+            
+    }
+    jumpTime(percent){
+        if(!this._currentSource)
+            throw new Error(`No current source`);
+        this._currentTime = Math.ceil(this._currentSource.totaltime * percent);
+        this._jumped = true;
+        this._tickUpdateClients();
+    }
+    
     registerClient(client) {
         const isLoggedIn = () => this._users.getUserForClient(client) !==null;
         
@@ -312,6 +339,17 @@ export class PlaylistModule extends ModuleBase {
             "player:resumed": () =>{
                 if(this._currentPaused)
                     this.resumeSource(); 
+            },
+            
+            "player:previous": () =>{
+                this.playPrevious(); 
+            },
+            "player:next": () =>{
+                this.playNextSource(); 
+            },           
+            
+            "player:jump": ({percent})=>{
+                this.jumpTime(percent);    
             }
         });
     }

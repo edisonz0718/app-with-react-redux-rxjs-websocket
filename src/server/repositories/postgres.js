@@ -55,7 +55,7 @@ export class PostgresPool {
                 console.error(`PostgresPool : failed to update row ${obj.title}: ${e.stack || e}`);
                 return Observable.throw(e);
             })
-            .do(console.log("PostgresPool : DELETE ROW COMPLETE!"));
+            .do(console.log("PostgresPool : UPDATE ROW COMPLETE!"));
     }   
     
 }

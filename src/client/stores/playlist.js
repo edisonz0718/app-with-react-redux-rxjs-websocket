@@ -81,6 +81,15 @@ export class PlaylistStore {
     resumeSource$(){
         return this._server.emitAction$("player:resumed", null);
     }
+    playPrevious$(){
+        return this._server.emitAction$("player:previous", null); 
+    }
+    playNext$(){
+        return this._server.emitAction$("player:next", null); 
+    }   
+    jumpTime$(percent){
+        return this._server.emitAction$("player:jump", {percent});
+    }
 }
 
 function opList(sources){
@@ -127,10 +136,10 @@ function opAdd({source}){
     };
 }
 
-function opCurrent({id, time, paused}){
+function opCurrent({id, time, opState}){
     return state => {
         if(id == null){
-            state.current = {source : null, time: 0 , progress: 0, paused};
+            state.current = {source : null, time: 0 , progress: 0, opState};
         } else {
              
             const source = state.map[id];
@@ -142,12 +151,12 @@ function opCurrent({id, time, paused}){
                     source : source,
                     time : time,
                     progress : calculateProgress(time,source),
-                    paused
+                    opState
                 };
             } else {
                 state.current.time = time;
                 state.current.progress = calculateProgress(time,source);
-                state.current.paused = paused;
+                state.current.opState = opState;
             }
         } 
         return {
@@ -241,5 +250,5 @@ function opError(state, error) {
 }
 
 function calculateProgress(time, source){
-    return Math.floor(Math.min(time / source.totaltime, 1) * 100);
+    return Math.min(time / source.totaltime, 1) * 100;
 }
