@@ -8,7 +8,9 @@ const vendorModules = [
     "socket.io-client",
     "rxjs", 
     "moment",
-    "moment-duration-format"
+    "moment-duration-format",
+    "react",
+    "react-dom"
 ];
     
 const dirname = path.resolve("./");
@@ -19,7 +21,7 @@ function createConfig(isDebug){
     
     const cssLoader = {test: /\.css$/, loader:"style!css"};  //'!' pipeline loader in <- order/
     const sassLoader = {test: /\.scss$/, loader:"style!css!sass"};
-    const appEntry = ["./src/client/app.js"];
+    const appEntry = ["./src/client/app.jsx"];
     if(!isDebug){
         plugins.push(new webpack.optimize.UglifyJsPlugin());
         plugins.push(new ExtractTextPlugin("[name].css"));
@@ -47,7 +49,7 @@ function createConfig(isDebug){
         },
         module:{
             loaders: [
-                {test: /\.js$/, loader: "babel", exclude: /node_modules/},
+                {test: /\.(js|jsx)$/, loader: "babel", exclude: /node_modules/},
                 {test: /\.js$/, loader: "eslint", exclude: /node_modules/},
 // if image is greater than 512 , it will bring it url encode inlined file,otherwise do request to server
                 {test: /\.(png|jpg|jpeg|gif|woff|ttf|eot|svg|woff2)/, loader:"url-loader?limit=512"},

@@ -1,0 +1,105 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'SQL_ASCII';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: source; Type: TABLE; Schema: public; Owner: ubuntu; Tablespace: 
+--
+
+CREATE TABLE source (
+    id uuid NOT NULL,
+    type character varying(50) NOT NULL,
+    url character varying(200) NOT NULL,
+    thumb character varying(500),
+    title character varying(500) NOT NULL,
+    totaltime integer NOT NULL,
+    "order" integer NOT NULL
+);
+
+
+ALTER TABLE public.source OWNER TO ubuntu;
+
+--
+-- Data for Name: source; Type: TABLE DATA; Schema: public; Owner: ubuntu
+--
+
+COPY source (id, type, url, thumb, title, totaltime, "order") FROM stdin;
+35464b01-89f9-11e6-ba41-87406f258d34	youtube	s7dTBoW5H9k	https://i.ytimg.com/vi/s7dTBoW5H9k/default.jpg	ELO - Mr. Blue Sky (Audio)	305	30000
+35464b03-89f9-11e6-ba41-87406f258d34	youtube	BDhJU_cNCZE	https://i.ytimg.com/vi/BDhJU_cNCZE/default.jpg	Electric Light Orchestra - Turn To Stone (Audio)	231	60000
+35464b04-89f9-11e6-ba41-87406f258d34	youtube	77R1Wp6Y_5Y	https://i.ytimg.com/vi/77R1Wp6Y_5Y/default.jpg	Electric Light Orchestra - Telephone Line (Audio)	282	70000
+e639aed0-89fd-11e6-85ae-81633c290aba	youtube	PRUuhwC3jbM	https://i.ytimg.com/vi/PRUuhwC3jbM/default.jpg	李榮浩 03 兩個人	290	22500
+91499a70-89fd-11e6-9735-174aa3cfae67	youtube	F4xDgB9jN20	https://i.ytimg.com/vi/F4xDgB9jN20/default.jpg	李榮浩 02 模特	307	62500
+35464b05-89f9-11e6-ba41-87406f258d34	youtube	PLNR4xfh1Qc	https://i.ytimg.com/vi/PLNR4xfh1Qc/default.jpg	Electric Light Orchestra - Roll Over Beethoven	278	63750
+2794deb0-8ddf-11e6-a59e-ed1e8b76aec6	youtube	_sQSXwdtxlY	https://i.ytimg.com/vi/_sQSXwdtxlY/default.jpg	【我的少女時代 Our Times】Movie Theme Song - 田馥甄 Hebe Tien《小幸運 A Little Happiness》Official MV	289	70002
+354623f0-89f9-11e6-ba41-87406f258d34	youtube	S9CmInt0tAo	https://i.ytimg.com/vi/S9CmInt0tAo/default.jpg	Electric Light Orchestra - Eldorado Overture (Audio)	133	37500
+23e1f180-89fd-11e6-9dea-ef95cc8da3cd	youtube	2xKc-rAyAdQ	https://i.ytimg.com/vi/2xKc-rAyAdQ/default.jpg	李榮浩 01 李白	274	31250
+78f68e50-8f62-11e6-9558-33f1d7636fec	youtube	yKNxeF4KMsY	https://i.ytimg.com/vi/yKNxeF4KMsY/default.jpg	Coldplay - Yellow	273	70003
+842c6dd0-8f62-11e6-9558-33f1d7636fec	youtube	0k_1kvDh2UA	https://i.ytimg.com/vi/0k_1kvDh2UA/default.jpg	Coldplay - Speed Of Sound	270	70004
+\.
+
+
+--
+-- Name: source_order_key; Type: CONSTRAINT; Schema: public; Owner: ubuntu; Tablespace: 
+--
+
+ALTER TABLE ONLY source
+    ADD CONSTRAINT source_order_key UNIQUE ("order");
+
+
+--
+-- Name: source_pkey; Type: CONSTRAINT; Schema: public; Owner: ubuntu; Tablespace: 
+--
+
+ALTER TABLE ONLY source
+    ADD CONSTRAINT source_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: source_url_key; Type: CONSTRAINT; Schema: public; Owner: ubuntu; Tablespace: 
+--
+
+ALTER TABLE ONLY source
+    ADD CONSTRAINT source_url_key UNIQUE (url);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

@@ -1,5 +1,7 @@
 import $ from "jquery";
 import "moment-duration-format";
+import React from "react";
+import ReactDOM from "react-dom";
 
 import "shared/operators";
 
@@ -7,6 +9,9 @@ import "./app.scss";
 
 import * as services from "./services"; 
 
+import Users from "./components/users/Users.jsx";
+import Chat from "./components/chat/Chat.jsx";
+/*
 //-----------------------------------
 // PLAYGROUND
 services.server.emitAction$("login",{username: "foo", password: "bar"})
@@ -17,6 +22,7 @@ services.server.emitAction$("login",{username: "foo", password: "bar"})
     }
     );
 //-----------------------------------
+*/
 // Auth
 const $html = $("html");
 services.usersStore.currentUser$.subscribe(user =>{
@@ -31,9 +37,21 @@ services.usersStore.currentUser$.subscribe(user =>{
 
 //-----------------------------------
 // Components
+//require("./components/users/users");
+ReactDOM.render(
+    <Users usersStore = {services.usersStore}/>,    
+    document.getElementById("users")
+);
+ReactDOM.render(
+    <Chat 
+        chatStore = {services.chatStore} 
+        usersStore = {services.usersStore} 
+        server = {services.server}
+    />,    
+    document.getElementById("chat")
+);
 require("./components/player/player");
-require("./components/users/users");
-require("./components/chat/chat");
+//require("./components/chat/chat");
 require("./components/playlist/playlist");
 //-----------------------------------
 // Bootstrap
