@@ -11,6 +11,7 @@ import * as services from "./services";
 
 import Users from "./components/users/Users.jsx";
 import Chat from "./components/chat/Chat.jsx";
+import Player from "./components/player/Player.jsx";
 /*
 //-----------------------------------
 // PLAYGROUND
@@ -50,7 +51,15 @@ ReactDOM.render(
     />,    
     document.getElementById("chat")
 );
-require("./components/player/player");
+
+ReactDOM.render(
+    <Player
+        playlistStore = {services.playlistStore}
+    />,
+    document.getElementById("player")
+);
+
+//require("./components/player/player");
 //require("./components/chat/chat");
 require("./components/playlist/playlist");
 //-----------------------------------

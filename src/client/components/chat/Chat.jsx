@@ -10,7 +10,10 @@ export default class Chat extends Component{
     constructor(props){
         super(props);
         this.state = {
-            messages: []    
+            messages: [],
+            isLoggedIn: false,
+            inputError: false,
+            disabled : ""
         }; 
         
     }
@@ -26,6 +29,12 @@ export default class Chat extends Component{
                 messages.push(newMessage);
                 this.setState({messages});
             });
+            
+        usersStore.currentUser$
+            .filter(u => u.isLoggedIn)
+            .subscribe(user=>{
+            this.setState({isLoggedIn: user.isLoggedIn}); 
+        });
         
     }
     userActionFactory({type, user}){
@@ -83,15 +92,43 @@ export default class Chat extends Component{
         );
         
     }
+    handleSubmit(e){
+        e.preventDefault();
+        return Observable.of(e)
+            .map(e => e.target.value.trim())
+            .filter(e=> e.length)
+            .withLatestFrom(this.props.usersStore.currentUser$)
+            .mergeMap(([value, user]) =>{
+                return user.isLoggedIn ? this._sendMessage$(value) : this._login$(value);
+            });
+
+    }
+    _sendMessage$(message) {
+        return this.props.chatStore.sendMessage$(message).catchWrap();
+    }
+    
+    _login$(username) {
+        this.setState({disabled: "disabled"});//disable input
+        return this.props.usersStore.login$(username).catchWrap()
+            .finally(()=>{
+                this.setState({disabled: ""});
+                //this._$input.focus();
+            });
+    }
     render(){
         return (
             <div>
             <h1></h1>    
             <ChatList {...this.state}/>
+            <ChatForm 
+                className="chat-form"
+                isLoggedIn = {this.state.isLoggedIn}
+                disabled = {this.state.disabled}
+                handleSubmit = {this.handleSubmit.bind(this)}
+            />
             </div>
         );
         
-            //<ChatForm className="chat-form"/>
     } 
 }
 

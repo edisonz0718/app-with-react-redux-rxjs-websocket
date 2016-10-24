@@ -80,6 +80,7 @@ body{
     background: $background-panel;
     flex-grow: 1;
     overflow: hidden;
+    display: flex;
     
     h1 {
         background: $border-panel;

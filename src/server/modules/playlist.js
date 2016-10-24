@@ -122,7 +122,8 @@ export class PlaylistModule extends ModuleBase {
             insertIndex = this._currentIdex + 1;
         }
 */
-        source.order = ++this._maxOrder;
+        
+        source.order = this._maxOrder+=10000;
         source.id = this.insertDB$(source);  
         
         if(!this._currentSource) 
@@ -134,10 +135,12 @@ export class PlaylistModule extends ModuleBase {
         //if(!this._currentSource)
             
         console.log(`playlist: added ${source.title}`);
+        /*
         if(this._maxOrder >= 10000){
             //update all entries' order to start from 1.
             return fail(`max order larger than 10000`); 
         }
+        */
     }
     
     insertDB$(source){
