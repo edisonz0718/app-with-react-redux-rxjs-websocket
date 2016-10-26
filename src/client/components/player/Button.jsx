@@ -1,6 +1,7 @@
 import React , {Component, PropTypes} from "react";
 
 export default class Button extends Component{
+    /*
     handleClick(e){
         if(this.props.type === "play-btn")
             this.props.resume();    
@@ -13,9 +14,11 @@ export default class Button extends Component{
         else if(this.props.type ==="next-btn")
             this.props.goNext();
     }
+    */
     render(){
-        const {type} = this.props;
+        const {type,icon,onClick} = this.props;
         let text = "";
+        /*
         let icon = null;
         if(type === "play-btn")
             icon = "fa fa-play"; 
@@ -31,12 +34,13 @@ export default class Button extends Component{
             icon = "fa fa-compress";       
         else if(type === "add-button")
             icon = "fa fa-plus-square";
+        */
         if(this.props.text)
             text = this.props.text;
             
         
         return (
-            <a href="#" onClick={this.handleClick.bind(this)} className={type}>
+            <a href="#" onClick={onClick} className={type}>
                 <i className={icon} aria-hidden="true"></i>{text}
             </a>         
         );    
@@ -45,5 +49,7 @@ export default class Button extends Component{
 
 Button.propTypes = {
     type : PropTypes.string.isRequired,
+    icon : PropTypes.string.isRequired,
+    onClick: PropTypes.func,
     text : PropTypes.string
 };

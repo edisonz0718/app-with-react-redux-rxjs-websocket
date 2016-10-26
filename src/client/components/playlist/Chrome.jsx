@@ -9,7 +9,7 @@ export default class Chrome extends Component {
         };
         return (
             <div className="chrome">
-                <ScrollArea />
+                <ScrollArea sources={this.props.sources}/>
                 <div className="playing-indicator" style={style}></div>
             </div>     
         );
@@ -17,5 +17,5 @@ export default class Chrome extends Component {
 }
 
 Chrome.propTypes = {
-    percent : PropTypes.number.isRequired    
+    percent : PropTypes.number    
 };

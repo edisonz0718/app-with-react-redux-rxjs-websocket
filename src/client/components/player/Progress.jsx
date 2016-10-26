@@ -9,7 +9,7 @@ export default class Progress extends Component {
         
         return (
             <span 
-                className={"youtube-progress " + this.props.type + (this.props.type === "current" && this.props.currentTransition ?" current-transition":"")}
+                className={this.props.type + (this.props.type === "youtube-process current" && this.props.currentTransition ?" current-transition":"")}
                 style={style}
             >
             </span>     

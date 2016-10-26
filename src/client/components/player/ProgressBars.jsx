@@ -11,12 +11,12 @@ export default class ProgressBars extends Component {
                 onClick={this.jumpProgress.bind(this)}
                 ref ={node=> this.node = node}
             >
-                <Progress type="total"/>         
-                <Progress type="current" 
+                <Progress type="youtube-progress total"/>         
+                <Progress type="youtube-progress current" 
                     width={this.props.curProgress} 
                     currentTransition={this.props.currentTransition}
                 />                    
-                <Progress type="buffered" width={this.props.bufProgress}/>                     
+                <Progress type="youtube-progress buffered" width={this.props.bufProgress}/>                     
             </div>
         );
     }    
