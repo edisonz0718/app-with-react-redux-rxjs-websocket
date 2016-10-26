@@ -1,7 +1,9 @@
-section.player {
+section.player > div {
+    //align-self: stretch;
     flex-shrink: 0;
-    height: 700px;
-    position: relative;
+    width: 100%;
+    height: 100%;
+    position: absolute;
     display: flex;
     flex-direction: column;
     flex-grow: 0;

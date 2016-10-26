@@ -12,6 +12,7 @@ import * as services from "./services";
 import Users from "./components/users/Users.jsx";
 import Chat from "./components/chat/Chat.jsx";
 import Player from "./components/player/Player.jsx";
+import Playlist from "./components/playlist/Playlist.jsx";
 /*
 //-----------------------------------
 // PLAYGROUND
@@ -58,10 +59,16 @@ ReactDOM.render(
     />,
     document.getElementById("player")
 );
+ReactDOM.render(
+    <Playlist
+        playlistStore = {services.playlistStore}
+    />,
+    document.getElementById("playlist")
+);
 
 //require("./components/player/player");
 //require("./components/chat/chat");
-require("./components/playlist/playlist");
+//require("./components/playlist/playlist");
 //-----------------------------------
 // Bootstrap
 

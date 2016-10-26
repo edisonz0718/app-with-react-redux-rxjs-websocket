@@ -10,7 +10,6 @@ export default class ChatForm extends Component{
         };
     }
     handleChange(e){
-        console.log(this.node.focus);
         this.setState({value: e.target.value}); 
     }
     handleSubmit(e){

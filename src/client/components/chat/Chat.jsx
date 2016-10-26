@@ -118,14 +118,14 @@ export default class Chat extends Component{
     render(){
         return (
             <div>
-            <h1></h1>    
-            <ChatList {...this.state}/>
-            <ChatForm 
-                className="chat-form"
-                isLoggedIn = {this.state.isLoggedIn}
-                disabled = {this.state.disabled}
-                handleSubmit = {this.handleSubmit.bind(this)}
-            />
+                <h1></h1>    
+                <ChatList {...this.state}/>
+                <ChatForm 
+                    className="chat-form"
+                    isLoggedIn = {this.state.isLoggedIn}
+                    disabled = {this.state.disabled}
+                    handleSubmit = {this.handleSubmit.bind(this)}
+                />
             </div>
         );
         
