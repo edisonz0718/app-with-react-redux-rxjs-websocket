@@ -9,7 +9,7 @@ export default class Chrome extends Component {
         };
         return (
             <div className="chrome">
-                <ScrollArea sources={this.props.sources}/>
+                <ScrollArea {...this.props}/>
                 <div className="playing-indicator" style={style}></div>
             </div>     
         );

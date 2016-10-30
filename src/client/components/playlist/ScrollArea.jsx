@@ -8,7 +8,7 @@ export default class ScrollArea extends Component {
         return (
             <div className="scroll-area">
                 <div className="placeholder"></div>        
-                <ItemList sources={this.props.sources}/>
+                <ItemList {...this.props}/>
                 <ContextMenu />
             </div>
         );
