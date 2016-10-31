@@ -46,28 +46,3 @@ export default class ItemList extends Component{
 ItemList.propTypes = {
     sources: PropTypes.array
 };
-/*
-            <ul className="playlist-list">
-                {sources.map(source =>{
-                    return (
-                        <Item 
-                            key={source.id}
-                            source ={source} 
-                            playSource={playSource}
-                            deleteSource={deleteSource}
-                            editMode={editMode}
-                        />);
-                })}
-            
-            </ul>     
-                                 <div className="inner">
-                                   <div className="thumb-wrapper">
-                                       <img className="thumb" src={config.source.thumb}/>
-                                   </div> 
-                                   <div className="details">
-                                       <span className="title" title={config.source.title}>{config.source.title}</span>
-                                       <time>{moment.duration(config.source.totaltime,"seconds").format()}</time>
-                                   </div>
-                                   <Progress type="progress" width={config.source.progress}/> 
-                                </div>                
-*/

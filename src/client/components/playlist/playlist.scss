@@ -129,14 +129,14 @@ section.playlist .scroll-area .placeholder{
 }
 
 html.sorting-playlist {
-    cursor: ns-resize !important;
+    //cursor: ns-resize !important;
     
     section.playlist .scroll-area .placeholder {
         display:block;
     }
     
     section.playlist .playlist-list > li {
-        cursor: ns-resize;
+        //cursor: ns-resize;
     }
 }
 
@@ -151,7 +151,7 @@ html.sorting-playlist {
 
 html.logged-in section.playlist .playlist-list > li {
     .thumb-wrapper img {
-        cursor: ns-resize; //north south resize
+        //cursor: ns-resize; //north south resize
     }
 }
 
@@ -238,7 +238,7 @@ section.playlist .playlist-list {
             
         }
        .delete-btn {
-           display:none; 
+           //display:none; 
            position: absolute; 
            top: 0;
            bottom: 0;
@@ -246,10 +246,14 @@ section.playlist .playlist-list {
            width: 0;
            background: darken($color-danger, 5%);
            text-align: center;
-           font-size: 20px;
+           font-size: 0px;
            color: $color-highlight;
+           transition: width 250ms,
+                       font-size 250ms;
+           //-webkit-transition: width 1000ms;
          
            >i {
+               //display:none;
                margin-top: 10px;
            }
        } 
@@ -313,13 +317,16 @@ section.playlist .playlist-list {
         &.edit {
             //background: lighten($border-panel,20%);
             background : lighten($border-panel,5%);
+            cursor: -webkit-grab;
+            cursor: grab;
             &:hover {
               
                .delete-btn {
-                   display:block;
+                   //display:block;
                    z-index: 50;
-                   //transition: width 2000ms;
                    width: 40px;
+                   font-size: 20px;
+                   
                }
            }
         }
