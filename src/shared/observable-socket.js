@@ -81,6 +81,7 @@ export class ObservableSocket {
             const request = this._popRequest(id); 
             if(!request)
                 return;
+            console.log(arg);
             request.error(arg);
         });
         this._actionCallbacks[action] = true;
@@ -151,6 +152,7 @@ export class ObservableSocket {
     
     _emitError(action, id ,error){
         const message = (error && error.clientMessage) || "Fatal Error";
+        //console.log(message);
         this._socket.emit(`${action}:fail`,{message},id);
     }
 }

@@ -21,7 +21,7 @@ export default class Chat extends Component{
         const {chatStore, usersStore, server} = this.props;
         Observable.merge(
             chatStore.message$.map(this.chatMessageFactory),
-            usersStore.state$.map(this.userActionFactory),
+            //usersStore.state$.map(this.userActionFactory),
             server.status$.map(this.serverStatusFactory))
             .filter(m=>m)
             .subscribe(newMessage => {
@@ -117,7 +117,7 @@ export default class Chat extends Component{
     }
     render(){
         return (
-            <div>
+            <section className="chat">
                 <h1></h1>    
                 <ChatList {...this.state}/>
                 <ChatForm 
@@ -126,7 +126,7 @@ export default class Chat extends Component{
                     disabled = {this.state.disabled}
                     handleSubmit = {this.handleSubmit.bind(this)}
                 />
-            </div>
+            </section>
         );
         
     } 

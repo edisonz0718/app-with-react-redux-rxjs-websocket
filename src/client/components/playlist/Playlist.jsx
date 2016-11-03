@@ -133,7 +133,7 @@ export default class Playlist extends Component{
             .catchWrap()
             .subscribe(response=>{
                 if(response && response.error)
-                    alert(response.error.message$ || "Unknown Error");
+                    alert(response.error.message || "Unknown Error");
             });
     }
     deleteSource(source){
@@ -141,12 +141,12 @@ export default class Playlist extends Component{
             .catchWrap()
             .subscribe(response=>{
                 if(response && response.error)
-                    alert(response.error.message$ || "Unknown Error");
+                    alert(response.error.message || "Unknown Error");
             });
     }
     render(){
         return(
-            <div>
+            <section className="playlist">
                 <h1>
                     <span className="title">{this.state.title}</span>
                     <span className="info">{this.state.totalTime}</span>
@@ -161,7 +161,7 @@ export default class Playlist extends Component{
                     deleteSource={this.deleteSource.bind(this)}
                     editMode={this.state.editMode}
                 />
-            </div>     
+            </section>     
         );
     } 
 }

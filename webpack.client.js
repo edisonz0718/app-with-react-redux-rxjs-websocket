@@ -10,7 +10,11 @@ const vendorModules = [
     "moment",
     "moment-duration-format",
     "react",
-    "react-dom"
+    "react-dom",
+    "redux",
+    "redux-logger",
+    "redux-observable",
+    "react-redux"
 ];
     
 const dirname = path.resolve("./");
@@ -21,7 +25,7 @@ function createConfig(isDebug){
     
     const cssLoader = {test: /\.css$/, loader:"style!css"};  //'!' pipeline loader in <- order/
     const sassLoader = {test: /\.scss$/, loader:"style!css!sass"};
-    const appEntry = ["./src/client/app.jsx"];
+    const appEntry = ["./src/client/main.jsx"];
     if(!isDebug){
         plugins.push(new webpack.optimize.UglifyJsPlugin());
         plugins.push(new ExtractTextPlugin("[name].css"));

@@ -1,4 +1,4 @@
-import _ from "lodash";
+//import _ from "lodash";
 import {Observable} from "rxjs";
 import {validateLogin} from "shared/validation/users";
 //this guy basically store all states, users info from server, act as a model
@@ -9,18 +9,20 @@ export class UsersStore {
     constructor(server) {
         this._server = server; 
         // Users List
+    /*
         const defaultStore = {users: []};
+    
         const events$ =  Observable.merge(
             this._server.on$("users:list").map(opList),
             this._server.on$("users:added").map(opAdd),
             this._server.on$("users:removed").map(opRemove)
         ); 
         this.state$ = events$
-            .scan(({state}/*ES6 pattern matching here*/,op)=>op(state), {state: defaultStore})
+            .scan(({state},op)=>op(state), {state: defaultStore})
             .publishReplay(1); // this observable's output stream is the lastest state.
     
         this.state$.connect(); //almost forget, this connect is to enable publish stream
-        
+     */   
         //Auth
         this.currentUser$ = Observable.merge(
             this._server.on$("auth:login"),
@@ -31,6 +33,7 @@ export class UsersStore {
             
         this.currentUser$.subscribe(user=> this._currentUser = user);
         //Bootstrap
+        /*
         this._server.on("connect",()=>{
             this._server.emit("users:list");
             
@@ -40,6 +43,7 @@ export class UsersStore {
                 user => console.log(`Logged in again as ${user.name}`),
                 error=> alert(`Cound not log back in ${error.message || "Unknown Error"}`));
         });
+        */
     }
     
     login$(name) {
@@ -55,7 +59,7 @@ export class UsersStore {
     }
 }
 
-
+/*
 function opList(users) {
     return state => {
         state.users = users;
@@ -99,3 +103,4 @@ function opRemove(user) {
         };
     };
 }
+*/

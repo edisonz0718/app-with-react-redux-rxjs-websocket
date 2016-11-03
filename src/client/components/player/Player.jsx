@@ -137,7 +137,7 @@ export default class Player extends Component {
     }
     render(){
         return (
-            <div>
+            <section className="player">
                 <h1>{this.state.title}</h1>
                 <div className="players">
                     <YoutubePlayer 
@@ -150,7 +150,7 @@ export default class Player extends Component {
                         {...this.state}
                     />
                 </div>     
-            </div>
+            </section>
         );
     }
 }
